@@ -5,22 +5,22 @@
 #include<conio.h>
 using namespace std;
 
-HANDLE Mutex=CreateMutex(NULL,FALSE,NULL);//»¥³â¶ÔÏó
+HANDLE Mutex=CreateMutex(NULL,FALSE,NULL);//äº’æ–¥å¯¹è±¡
 
 int GameOver=0;
 int level=0;
 int map[23][23];
-//Ì¹¿ËÖÖÀà£¬NormalÎªÍæ¼ÒÌ¹¿Ë
+//å¦å…‹ç§ç±»ï¼ŒNormalä¸ºç©å®¶å¦å…‹
 #define Normal 0
 #define Red 1
 #define Blue 2
 #define Green 3
-//·½ÏòµÄºê¶¨Òå
+//æ–¹å‘çš„å®å®šä¹‰
 #define Up 0
 #define Down 1
 #define Left 2
 #define Right 3
-//µØÍ¼±ê¼ÇµÄºê¶¨Òå
+//åœ°å›¾æ ‡è®°çš„å®å®šä¹‰
 #define Empty 0
 #define Player 1
 #define PlayerBullet 2
@@ -32,14 +32,14 @@ int KillRed;
 int KillGreen;
 int EnemyExist;
 
-void SetPos(int i,int j)//Éè¶¨¹â±êÎ»ÖÃ
+void SetPos(int i,int j)//è®¾å®šå…‰æ ‡ä½ç½®
 {
 	COORD pos={i,j};
 	HANDLE Out=GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleCursorPosition(Out, pos);
 }
 
-void HideCurSor(void)//Òş²Ø¹â±ê
+void HideCurSor(void)//éšè—å…‰æ ‡
 {
 	CONSOLE_CURSOR_INFO info={1,0};
 	HANDLE Out=GetStdHandle(STD_OUTPUT_HANDLE);
@@ -52,20 +52,20 @@ int sharp[4][12]=
 	{0,0,0,2,1,0,1,1,1,2,2,1},
 	{0,1,0,2,1,0,1,1,2,1,2,2},
 	{0,0,0,1,1,1,1,2,2,0,2,1},
-};//´ËÊı×éÓÃÀ´±£´æÌ¹¿Ë¸÷¸ö·½ÏòµÄĞÎ×´ĞÅÏ¢
+};//æ­¤æ•°ç»„ç”¨æ¥ä¿å­˜å¦å…‹å„ä¸ªæ–¹å‘çš„å½¢çŠ¶ä¿¡æ¯
 
-DWORD WINAPI Bulletfly(LPVOID lpParameter);//×Óµ¯º¯ÊıÉêÃ÷
-void Updata();//¸üĞÂ½çÃæĞÅÏ¢º¯ÊıÉêÃ÷
+DWORD WINAPI Bulletfly(LPVOID lpParameter);//å­å¼¹å‡½æ•°ç”³æ˜
+void Updata();//æ›´æ–°ç•Œé¢ä¿¡æ¯å‡½æ•°ç”³æ˜
 
-class Tank//Ì¹¿ËÀà
+class Tank//å¦å…‹ç±»
 {
 private:
-	int Direction;//·½Ïò
-	int hotpoint[2];//»î¶¯µã
-	int Speed;//ËÙ¶È
-	int FirePower;//»ğÁ¦
+	int Direction;//æ–¹å‘
+	int hotpoint[2];//æ´»åŠ¨ç‚¹
+	int Speed;//é€Ÿåº¦
+	int FirePower;//ç«åŠ›
 public:
-	Tank(int dir,int hot1,int hot2,int typ,int spe,int firepow)//¹¹Ôìº¯Êı
+	Tank(int dir,int hot1,int hot2,int typ,int spe,int firepow)//æ„é€ å‡½æ•°
 	{
 		Direction=dir;
 		hotpoint[0]=hot1;
@@ -74,27 +74,27 @@ public:
 		Speed=spe;
 		FirePower=firepow;
 	}
-	int Type;//Ì¹¿ËµÄÖÖÀà£¨Ïê¼ûºê¶¨Òå£©
-	int ID;//Ì¹¿ËÔÚMAPÖĞµÄ±ê¼Ç£¨Ïê¼ûºê¶¨Òå£©
-	int FireEnable;//ÊÇ·ñ¿ÉÒÔ¿ª»ğ
-	int Life;//ÉúÃüÖµ
-	void Running();//ÔËĞĞº¯Êı
-	int Judge(int x,int y,int ID);//ÅĞ¶ÏÊÇ·ñ¿ÉÒÔ»æÖÆÌ¹¿Ë
-	void DrawTank();//ÖØ»æÌ¹¿Ë
-	void Redraw();//²Á³ıÌ¹¿Ë
-	int GetSpeed()//»ñÈ¡ËÙ¶È
+	int Type;//å¦å…‹çš„ç§ç±»ï¼ˆè¯¦è§å®å®šä¹‰ï¼‰
+	int ID;//å¦å…‹åœ¨MAPä¸­çš„æ ‡è®°ï¼ˆè¯¦è§å®å®šä¹‰ï¼‰
+	int FireEnable;//æ˜¯å¦å¯ä»¥å¼€ç«
+	int Life;//ç”Ÿå‘½å€¼
+	void Running();//è¿è¡Œå‡½æ•°
+	int Judge(int x,int y,int ID);//åˆ¤æ–­æ˜¯å¦å¯ä»¥ç»˜åˆ¶å¦å…‹
+	void DrawTank();//é‡ç»˜å¦å…‹
+	void Redraw();//æ“¦é™¤å¦å…‹
+	int GetSpeed()//è·å–é€Ÿåº¦
 	{
 		return Speed;
 	}
-	int GetFire()//»ñÈ¡»ğÁ¦
+	int GetFire()//è·å–ç«åŠ›
 	{
 		return FirePower;
 	}
-	int GetDirection()//»ñÈ¡·½Ïò
+	int GetDirection()//è·å–æ–¹å‘
 	{
 		return Direction;
 	}
-	int GetHotX()//»ñÈ¡»î¶¯µã×ø±ê
+	int GetHotX()//è·å–æ´»åŠ¨ç‚¹åæ ‡
 	{
 		return hotpoint[0];
 	}
@@ -102,29 +102,29 @@ public:
 	{
 		return hotpoint[1];
 	}
-	void IncreaseFire()//»ğÁ¦+
+	void IncreaseFire()//ç«åŠ›+
 	{
 		FirePower++;
 	}
-	void IncreaseSpeed()//ËÙ¶È+
+	void IncreaseSpeed()//é€Ÿåº¦+
 	{
 		Speed++;
 	}
-	void ChangeDirection(int newD)//¸Ä±ä·½Ïò
+	void ChangeDirection(int newD)//æ”¹å˜æ–¹å‘
 	{
 		Direction=newD;
 	}
-	void ChangePos(int x,int y)//¸Ä±ä»î¶¯µã
+	void ChangePos(int x,int y)//æ”¹å˜æ´»åŠ¨ç‚¹
 	{
 		hotpoint[0]=x;
 		hotpoint[1]=y;
 	}
 };
 
-Tank player(Right,0,0,Normal,1,1);//Íæ¼Ò
-Tank enemy(Left,20,0,Red,1,1);//µĞÈË
+Tank player(Right,0,0,Normal,1,1);//ç©å®¶
+Tank enemy(Left,20,0,Red,1,1);//æ•Œäºº
 
-void Tank::DrawTank()//»æÖÆÌ¹¿Ë
+void Tank::DrawTank()//ç»˜åˆ¶å¦å…‹
 {
 	 int i;
 	 int nx,ny;
@@ -140,13 +140,13 @@ void Tank::DrawTank()//»æÖÆÌ¹¿Ë
 	{ 
 		nx=hotpoint[0]+sharp[Direction][i*2];
 		ny=hotpoint[1]+sharp[Direction][i*2+1];
-		SetPos((ny+1)*2,nx+1);//ÀûÓÃsharpÊı×éÏà¶ÔÓÚµãx,y»æÖÆĞÎ×´
+		SetPos((ny+1)*2,nx+1);//åˆ©ç”¨sharpæ•°ç»„ç›¸å¯¹äºç‚¹x,yç»˜åˆ¶å½¢çŠ¶
 		map[nx][ny]=ID;
-		cout<<"¡ö";
+		cout<<"â– ";
 	}
 }
 
-void Tank::Redraw()//²Á³ıÌ¹¿Ë£¬Ô­ÀíÍ¬ÉÏ
+void Tank::Redraw()//æ“¦é™¤å¦å…‹ï¼ŒåŸç†åŒä¸Š
 {
 	 int i;
 	 int nx,ny;
@@ -160,7 +160,7 @@ void Tank::Redraw()//²Á³ıÌ¹¿Ë£¬Ô­ÀíÍ¬ÉÏ
 	}
 }
 
-int Tank::Judge(int x,int y,int dir)//ÅĞ¶Ïµ±Ç°ÊÇ·ñ¿ÉÒÔ»æÖÆÌ¹¿Ë
+int Tank::Judge(int x,int y,int dir)//åˆ¤æ–­å½“å‰æ˜¯å¦å¯ä»¥ç»˜åˆ¶å¦å…‹
 {
 	int i;
 	int nx,ny;
@@ -168,40 +168,40 @@ int Tank::Judge(int x,int y,int dir)//ÅĞ¶Ïµ±Ç°ÊÇ·ñ¿ÉÒÔ»æÖÆÌ¹¿Ë
 	{ 
 		nx=x+sharp[dir][i*2];
 		ny=y+sharp[dir][i*2+1];
-		if(nx<0||nx>=23||ny<0||ny>=23||map[nx][ny]!=Empty)//²»ÄÜ»æÖÆ£¬·µ»Ø1
+		if(nx<0||nx>=23||ny<0||ny>=23||map[nx][ny]!=Empty)//ä¸èƒ½ç»˜åˆ¶ï¼Œè¿”å›1
 			return 1;
 	}
 	return 0;
 }
 
 
-void Tank::Running()//Ì¹¿ËÔËĞĞº¯Êı
+void Tank::Running()//å¦å…‹è¿è¡Œå‡½æ•°
 {
 	int newD;
-	//Ì¹¿ËµÄÔËĞĞ
+	//å¦å…‹çš„è¿è¡Œ
 	while(1)
 	{
 		if(Life==0)
 		{
-			EnemyExist=0;//µĞÈË²»´æÔÚ
+			EnemyExist=0;//æ•Œäººä¸å­˜åœ¨
 			return;
 		}
 		if(GameOver==1)
 			return;
-		if(FireEnable==1&&GameOver==0)//Èç¹û¿ÉÒÔ¿ª»ğ
+		if(FireEnable==1&&GameOver==0)//å¦‚æœå¯ä»¥å¼€ç«
 		{
-			WaitForSingleObject(Mutex,INFINITE);//Ïß³ÌÓµÓĞ»¥³â¶ÔÏó
-			FireEnable=0;//ÉèÎª²»¿É¿ª»ğ
-			HANDLE bullet=CreateThread(NULL,0,Bulletfly,&ID,0,NULL);//´´½¨×Óµ¯Ïß³Ì
+			WaitForSingleObject(Mutex,INFINITE);//çº¿ç¨‹æ‹¥æœ‰äº’æ–¥å¯¹è±¡
+			FireEnable=0;//è®¾ä¸ºä¸å¯å¼€ç«
+			HANDLE bullet=CreateThread(NULL,0,Bulletfly,&ID,0,NULL);//åˆ›å»ºå­å¼¹çº¿ç¨‹
 			CloseHandle(bullet);
-			ReleaseMutex(Mutex);//ÊÍ·Å»¥³â¶ÔÏó
+			ReleaseMutex(Mutex);//é‡Šæ”¾äº’æ–¥å¯¹è±¡
 			Sleep(100);
 		}
-		WaitForSingleObject(Mutex,INFINITE);//Ïß³ÌÓµÓĞ»¥³â¶ÔÏó
+		WaitForSingleObject(Mutex,INFINITE);//çº¿ç¨‹æ‹¥æœ‰äº’æ–¥å¯¹è±¡
 		srand((int)time(0));
 	    newD=rand()%4;
 		
-		if(newD==Up)//Ëæ»ú³öĞÂµÄ·½Ïò²¢ÖØĞÂ»æÖÆÌ¹¿Ë
+		if(newD==Up)//éšæœºå‡ºæ–°çš„æ–¹å‘å¹¶é‡æ–°ç»˜åˆ¶å¦å…‹
 		{
 			Redraw();
 			if(Judge(hotpoint[0]-1,hotpoint[1],newD)==0)
@@ -259,23 +259,23 @@ void Tank::Running()//Ì¹¿ËÔËĞĞº¯Êı
 		}
 		if(GameOver==0&&Life!=0)
 		   DrawTank();
-		ReleaseMutex(Mutex);//ÊÍ·Å»¥³â¶ÔÏó
+		ReleaseMutex(Mutex);//é‡Šæ”¾äº’æ–¥å¯¹è±¡
 		Sleep(500-80*Speed);
 	}
 }
 
-/*********************×Óµ¯Ïß³Ìº¯Êı*******************/
+/*********************å­å¼¹çº¿ç¨‹å‡½æ•°*******************/
 DWORD WINAPI Bulletfly(LPVOID lpParameter)
 {
-	int *ID=(int *)lpParameter;//IDÓÃÀ´»ñÈ¡·¢Éä×Óµ¯Ì¹¿ËµÄID
-	int Pos[2];//×Óµ¯»î¶¯µã
+	int *ID=(int *)lpParameter;//IDç”¨æ¥è·å–å‘å°„å­å¼¹å¦å…‹çš„ID
+	int Pos[2];//å­å¼¹æ´»åŠ¨ç‚¹
 	int direction;
 	int Speed;
 	int type;
-	int hit=0;//»÷ÖĞ±ê¼Ç
-	int oldx,oldy;//¾É»î¶¯µã
-	int flag=0;//×Óµ¯ÊÇ·ñÓĞÒÆ¶¯µÄ±ê¼Ç
-	if(*ID==Player)//Èç¹ûÊÇÍæ¼ÒÌ¹¿Ë
+	int hit=0;//å‡»ä¸­æ ‡è®°
+	int oldx,oldy;//æ—§æ´»åŠ¨ç‚¹
+	int flag=0;//å­å¼¹æ˜¯å¦æœ‰ç§»åŠ¨çš„æ ‡è®°
+	if(*ID==Player)//å¦‚æœæ˜¯ç©å®¶å¦å…‹
 	{
 		type=PlayerBullet;
 		direction=player.GetDirection();
@@ -283,7 +283,7 @@ DWORD WINAPI Bulletfly(LPVOID lpParameter)
 		Pos[0]=player.GetHotX();
 		Pos[1]=player.GetHotY();
 	}
-    else if(*ID==Enemy)//Èç¹ûÊÇµĞÈËÌ¹¿Ë
+    else if(*ID==Enemy)//å¦‚æœæ˜¯æ•Œäººå¦å…‹
 	{
 		type=EnemyBullet;
 		direction=enemy.GetDirection();
@@ -291,7 +291,7 @@ DWORD WINAPI Bulletfly(LPVOID lpParameter)
 		Pos[0]=enemy.GetHotX();
 		Pos[1]=enemy.GetHotY();
 	}
-	if(direction==Up)//¸ù¾İÌ¹¿ËµÄÎ»ÖÃºÍ·½ÏòÈ·¶¨×Óµ¯µÄ³õÊ¼×ø±ê
+	if(direction==Up)//æ ¹æ®å¦å…‹çš„ä½ç½®å’Œæ–¹å‘ç¡®å®šå­å¼¹çš„åˆå§‹åæ ‡
 	{
 		Pos[0]--;
 		Pos[1]++;
@@ -311,11 +311,11 @@ DWORD WINAPI Bulletfly(LPVOID lpParameter)
 		Pos[0]++;
 		Pos[1]+=3;
 	}
-	//×Óµ¯µÄÔËĞĞ
+	//å­å¼¹çš„è¿è¡Œ
 	while(1)
 	{
-		WaitForSingleObject(Mutex,INFINITE);//Õâ¸ö²»ÔÙ×¢ÊÍÁË¡£¡£¡£¡£¡£
-		if(flag==1&&hit!=1)//²Á³ıÔ­Î»ÖÃ
+		WaitForSingleObject(Mutex,INFINITE);//è¿™ä¸ªä¸å†æ³¨é‡Šäº†ã€‚ã€‚ã€‚ã€‚ã€‚
+		if(flag==1&&hit!=1)//æ“¦é™¤åŸä½ç½®
 		{
     	   map[oldx][oldy]=Empty;
 		   SetPos((oldy+1)*2,oldx+1);
@@ -323,7 +323,7 @@ DWORD WINAPI Bulletfly(LPVOID lpParameter)
 		}
 		if(GameOver==1)
 			return 0;
-		if(hit==1||Pos[0]<0||Pos[0]>22||Pos[1]<0||Pos[1]>22)//Èç¹û»÷ÖĞ
+		if(hit==1||Pos[0]<0||Pos[0]>22||Pos[1]<0||Pos[1]>22)//å¦‚æœå‡»ä¸­
 		{
 			ReleaseMutex(Mutex);
 			Sleep(500);
@@ -333,55 +333,55 @@ DWORD WINAPI Bulletfly(LPVOID lpParameter)
 				enemy.FireEnable=1;
 			break;
 		}
-		switch(map[Pos[0]][Pos[1]])//×Óµ¯¾­¹ıµÄMAPµÄ±ê¼Ç
+		switch(map[Pos[0]][Pos[1]])//å­å¼¹ç»è¿‡çš„MAPçš„æ ‡è®°
 		{
 			
-		   case Empty://Èç¹ûÊÇ¿ÕÎ»ÖÃ¾Í»æÖÆ×Óµ¯
+		   case Empty://å¦‚æœæ˜¯ç©ºä½ç½®å°±ç»˜åˆ¶å­å¼¹
 			    map[Pos[0]][Pos[1]]=type;
 				SetPos((Pos[1]+1)*2,Pos[0]+1);
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-				cout<<"¡ö";
+				cout<<"â– ";
 			    break;
-		   case Player://Èç¹ûÊÇÍæ¼ÒÎ»ÖÃ
+		   case Player://å¦‚æœæ˜¯ç©å®¶ä½ç½®
 			   if(type!=PlayerBullet)
 			   {
-			      player.Life--;//ÉúÃü¼õÉÙ
+			      player.Life--;//ç”Ÿå‘½å‡å°‘
 				  if(player.Life<=0)
 					 GameOver=1;
 			    }
 			    Updata();
 			    hit=1;
 			    break;
-		   case Enemy://Èç¹ûÊÇµĞÈËÎ»ÖÃ
+		   case Enemy://å¦‚æœæ˜¯æ•Œäººä½ç½®
 			    if(type!=PlayerBullet)
 					hit=1;
 				else
 				{
 					hit=1;
 					Kill++;
-					if(Kill%20==0&&player.Life<5)//»÷É±Êı++
+					if(Kill%20==0&&player.Life<5)//å‡»æ€æ•°++
 						player.Life++;
-					if(enemy.Type==Red)//Èç¹û»÷É±ºìÌ¹¿Ë
+					if(enemy.Type==Red)//å¦‚æœå‡»æ€çº¢å¦å…‹
 					{
 						KillRed++;
 						if(KillRed%10==0&&player.GetFire()<5)
 							player.IncreaseFire();
 					}
-					if(enemy.Type==Green)///Èç¹û»÷É±ÂÌÌ¹¿Ë
+					if(enemy.Type==Green)///å¦‚æœå‡»æ€ç»¿å¦å…‹
 					{
 						KillGreen++;
 						if(KillGreen%10==0&&player.GetSpeed()<5)
 							player.IncreaseSpeed();
 					}
-					enemy.Redraw();//²Á³ıµĞÈË
-					enemy.Life=0;//µĞÈËËÀÍö
+					enemy.Redraw();//æ“¦é™¤æ•Œäºº
+					enemy.Life=0;//æ•Œäººæ­»äº¡
 				}
 				Updata();
 			   break;
 		}
 		oldx=Pos[0];
 		oldy=Pos[1];
-		if(direction==Up)//×Óµ¯ÒÆ¶¯
+		if(direction==Up)//å­å¼¹ç§»åŠ¨
 		   Pos[0]--;
 	     else if(direction==Down)
 	    	Pos[0]++;
@@ -397,12 +397,12 @@ DWORD WINAPI Bulletfly(LPVOID lpParameter)
 }
 
 
-/*************************µĞÈËÏß³Ìº¯Êı***************************/
+/*************************æ•Œäººçº¿ç¨‹å‡½æ•°***************************/
 DWORD WINAPI TankRuning(LPVOID lpParameter)
 {
 	Sleep(400);
 	int Pos;
-	int Start[2];//µĞÈËÆğÊ¼µØÖ·
+	int Start[2];//æ•Œäººèµ·å§‹åœ°å€
 	int typ;
 	int fire;
 	int spe;
@@ -410,7 +410,7 @@ DWORD WINAPI TankRuning(LPVOID lpParameter)
 	{
 		if(GameOver==1)
 			return 0;
-	    srand((int)time(0));//Ëæ»ú³öµĞÈËÆğÊ¼µØÖ·
+	    srand((int)time(0));//éšæœºå‡ºæ•Œäººèµ·å§‹åœ°å€
 	    Pos=rand()%4;
 	    if(Pos==0)
 	    {
@@ -437,7 +437,7 @@ DWORD WINAPI TankRuning(LPVOID lpParameter)
 	}
 	WaitForSingleObject(Mutex,INFINITE);
 	srand((int)time(0));
-	typ=rand()%3+1;//Ëæ»ú³öµĞÈËµÄÖÖÀà
+	typ=rand()%3+1;//éšæœºå‡ºæ•Œäººçš„ç§ç±»
 	if(typ==Blue)
 	{
 		spe=1+level;
@@ -453,7 +453,7 @@ DWORD WINAPI TankRuning(LPVOID lpParameter)
 		spe=3+level;
 		fire=1+level;
 	}
-    enemy=Tank(Down,Start[0],Start[1],typ,spe,fire);//ÖØĞÂÉú³ÉµĞÈËÌ¹¿Ë
+    enemy=Tank(Down,Start[0],Start[1],typ,spe,fire);//é‡æ–°ç”Ÿæˆæ•Œäººå¦å…‹
 	enemy.ID=Enemy;
 	enemy.Life=1;
 	enemy.FireEnable=1;
@@ -463,7 +463,7 @@ DWORD WINAPI TankRuning(LPVOID lpParameter)
 }
 
 
-void Init()//³õÊ¼»¯º¯Êı
+void Init()//åˆå§‹åŒ–å‡½æ•°
 {
 	Kill=0;
 	KillRed=0;
@@ -479,54 +479,54 @@ void Init()//³õÊ¼»¯º¯Êı
 	EnemyExist=0;
 }
 
-void Updata()//¸üĞÂ½çÃæĞÅÏ¢
+void Updata()//æ›´æ–°ç•Œé¢ä¿¡æ¯
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	int i;
 	SetPos(53,0);
-	cout<<"ÉúÃüÖµ£º";
+	cout<<"ç”Ÿå‘½å€¼ï¼š";
 	SetPos(53,1);
 	for(i=0;i<5;i++)
 	{
 		if(i<player.Life)
-			cout<<"¡ö";
+			cout<<"â– ";
 		else
 			cout<<" ";
 	}
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_GREEN);
 	SetPos(53,3);
-	cout<<"ÒÆ¶¯ËÙ¶È£º";
+	cout<<"ç§»åŠ¨é€Ÿåº¦ï¼š";
 	SetPos(53,4);
 	for(i=0;i<5;i++)
 	{
 		if(i<player.GetSpeed())
-			cout<<"¡ö";
+			cout<<"â– ";
 		else
 			cout<<" ";
 	}
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED);
 	SetPos(53,5);
-	cout<<"»ğÁ¦£º";
+	cout<<"ç«åŠ›ï¼š";
 	SetPos(53,6);
 	for(i=0;i<5;i++)
 	{
 		if(i<player.GetFire())
-			cout<<"¡ö";
+			cout<<"â– ";
 		else
 			cout<<" ";
 	}
     SetPos(53,8);
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-	cout<<"É±µĞÊı£º"<<Kill;
+	cout<<"æ€æ•Œæ•°ï¼š"<<Kill;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED);
 	SetPos(53,9);
-	cout<<"É±ËÀºìÌ¹¿Ë£º"<<KillRed;
+	cout<<"æ€æ­»çº¢å¦å…‹ï¼š"<<KillRed;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_GREEN);
 	SetPos(53,10);
-	cout<<"É±ËÀÂÌÌ¹¿Ë£º"<<KillGreen;
+	cout<<"æ€æ­»ç»¿å¦å…‹ï¼š"<<KillGreen;
 
 }
-void DrawMap()//»­½çÃæ
+void DrawMap()//ç”»ç•Œé¢
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	system("cls");
@@ -534,56 +534,56 @@ void DrawMap()//»­½çÃæ
 	for(i=0;i<25;i++)
 	{
 		 SetPos(i*2,0);
-		 cout<<"¡ö";
+		 cout<<"â– ";
 	}
 	for(i=1;i<25;i++)
 	{
 		SetPos(0,i);
-		cout<<"¡ö";
+		cout<<"â– ";
 		SetPos(24*2,i);
-		cout<<"¡ö";
+		cout<<"â– ";
 	}
 	for(i=0;i<25;i++)
 	{
 		 SetPos(i*2,24);
-		 cout<<"¡ö";
+		 cout<<"â– ";
 	}
 	
 	Updata();
 	
 }
 
-void Welcome()//»¶Ó­½çÃæ
+void Welcome()//æ¬¢è¿ç•Œé¢
 {
 	int x;
 	system("cls");
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	SetPos(10,5);
-	cout<<"¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö";
+	cout<<"â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ";
 	SetPos(10,6);
-	cout<<"¡ö        Ì¹¿Ë´óÕ½¿ØÖÆÌ¨°æ                    ¡ö";
+	cout<<"â–                å¦å…‹å¤§æˆ˜                     â– ";
 	SetPos(10,7);
-	cout<<"¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö";
+	cout<<"â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ";
 	SetPos(10,8);
-	cout<<"¡ö       ·½Ïò¼üÒÆ¶¯£¬¿Õ¸ñ¼üÉä»÷               ¡ö";
+	cout<<"â–        æ–¹å‘é”®ç§»åŠ¨ï¼Œç©ºæ ¼é”®å°„å‡»               â– ";
 	SetPos(10,9);
-	cout<<"¡ö       µĞÈË·ÖÎª3ÖÖ£¬À¶É«ÎªÆÕÍ¨µĞÈË          ¡ö";
+	cout<<"â–        æ•Œäººåˆ†ä¸º3ç§ï¼Œè“è‰²ä¸ºæ™®é€šæ•Œäºº          â– ";
 	SetPos(10,10);
-	cout<<"¡ö     ºìÉ«µĞÈË¸ßÉäËÙ£¬ÂÌÉ«µĞÈË¸ß»ú¶¯ĞÔ       ¡ö";
+	cout<<"â–      çº¢è‰²æ•Œäººé«˜å°„é€Ÿï¼Œç»¿è‰²æ•Œäººé«˜æœºåŠ¨æ€§       â– ";
 	SetPos(10,11);
-	cout<<"¡ö Ã¿É±ËÀ10¸öºìÌ¹¿Ë£¬Íæ¼ÒÉäËÙÌá¸ß(×î¸ßÎå¼¶£©  ¡ö";
+	cout<<"â–  æ¯æ€æ­»10ä¸ªçº¢å¦å…‹ï¼Œç©å®¶å°„é€Ÿæé«˜(æœ€é«˜äº”çº§ï¼‰  â– ";
 	SetPos(10,12);
-	cout<<"¡ö Ã¿É±ËÀ10¸öÂÌÌ¹¿Ë£¬Íæ¼ÒÒÆ¶¯ĞÔÌá¸ß(×î¸ßÎå¼¶£©¡ö";
+	cout<<"â–  æ¯æ€æ­»10ä¸ªç»¿å¦å…‹ï¼Œç©å®¶ç§»åŠ¨æ€§æé«˜(æœ€é«˜äº”çº§ï¼‰â– ";
 	SetPos(10,13);
-	cout<<"¡ö   Ã¿É±ËÀ20¸öÌ¹¿Ë£¬Íæ¼ÒÉúÃü+1£¨×î¸ßÎå¸ñ£©   ¡ö";
+	cout<<"â–    æ¯æ€æ­»20ä¸ªå¦å…‹ï¼Œç©å®¶ç”Ÿå‘½+1ï¼ˆæœ€é«˜äº”æ ¼ï¼‰   â– ";
 	SetPos(10,14);
-	cout<<"¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö";	
+	cout<<"â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ";	
 	SetPos(10,15);
-	cout<<"¡ö    ºÎÄ³×÷£¨°Ù¶ÈID:HapHapYear£©             ¡ö";
+	cout<<"â–                                             â– ";
 	SetPos(10,16);
-	cout<<"¡ö           °´1-3Ñ¡ÔñÄÑ¶È                    ¡ö";
+	cout<<"â–            æŒ‰1-3é€‰æ‹©éš¾åº¦                    â– ";
 	SetPos(10,17);
-	cout<<"¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö¡ö";
+	cout<<"â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ";
 	while(1)
 	{
 		x=getch();
@@ -604,12 +604,12 @@ int main()
 	player.DrawTank();
 	while(GameOver==0)
 	{
-		if(GetAsyncKeyState(VK_UP))//°´¼üÉÏ
+		if(GetAsyncKeyState(VK_UP))//æŒ‰é”®ä¸Š
 		{
 			WaitForSingleObject(Mutex,INFINITE);
 			newD=Up;
 			player.Redraw();
-			if(player.Judge(player.GetHotX()-1,player.GetHotY(),newD)==0)//ÒÆ¶¯Íæ¼ÒÌ¹¿Ë£¬Ô­ÀíºÍµĞÈËº¯ÊıÒ»Ñù
+			if(player.Judge(player.GetHotX()-1,player.GetHotY(),newD)==0)//ç§»åŠ¨ç©å®¶å¦å…‹ï¼ŒåŸç†å’Œæ•Œäººå‡½æ•°ä¸€æ ·
 			{
 				player.ChangePos(player.GetHotX()-1,player.GetHotY());
 				player.ChangeDirection(newD);
@@ -622,9 +622,9 @@ int main()
 			if(GameOver==0)
 			   player.DrawTank();
 			ReleaseMutex(Mutex);
-			Sleep(200-player.GetSpeed()*20);//°´¼üÑÓ³Ù£¬¾ö¶¨Íæ¼ÒÌ¹¿ËµÄËÙ¶È
+			Sleep(200-player.GetSpeed()*20);//æŒ‰é”®å»¶è¿Ÿï¼Œå†³å®šç©å®¶å¦å…‹çš„é€Ÿåº¦
 		}
-		else if(GetAsyncKeyState(VK_DOWN))//°´¼üÏÂ£¬Í¬ÉÏ
+		else if(GetAsyncKeyState(VK_DOWN))//æŒ‰é”®ä¸‹ï¼ŒåŒä¸Š
 		{
 			WaitForSingleObject(Mutex,INFINITE);
 			newD=Down;
@@ -644,7 +644,7 @@ int main()
 			ReleaseMutex(Mutex);
 			Sleep(200-player.GetSpeed()*20);
 		}
-		else if(GetAsyncKeyState(VK_RIGHT))//°´¼üÓÒ£¬Í¬ÉÏ
+		else if(GetAsyncKeyState(VK_RIGHT))//æŒ‰é”®å³ï¼ŒåŒä¸Š
 		{
 			WaitForSingleObject(Mutex,INFINITE);
 			newD=Right;
@@ -664,7 +664,7 @@ int main()
 			ReleaseMutex(Mutex);
 			Sleep(200-player.GetSpeed()*20);
 		}
-		else if(GetAsyncKeyState(VK_LEFT))//°´¼ü×ó£¬Í¬ÉÏ
+		else if(GetAsyncKeyState(VK_LEFT))//æŒ‰é”®å·¦ï¼ŒåŒä¸Š
 		{
 			WaitForSingleObject(Mutex,INFINITE);
 			newD=Left;
@@ -684,22 +684,22 @@ int main()
 			ReleaseMutex(Mutex);
 			Sleep(110-player.GetSpeed()*10);
 		}
-		else if(GetAsyncKeyState(VK_SPACE))//°´¼ü¿Õ¸ñ£¬·¢Éä×Óµ¯
+		else if(GetAsyncKeyState(VK_SPACE))//æŒ‰é”®ç©ºæ ¼ï¼Œå‘å°„å­å¼¹
 		{
 			WaitForSingleObject(Mutex,INFINITE);
-			if(player.FireEnable==1)//Èç¹û¿ÉÒÔ·¢Éä
+			if(player.FireEnable==1)//å¦‚æœå¯ä»¥å‘å°„
 			{
-			   HANDLE bullet=CreateThread(NULL,0,Bulletfly,&(player.ID),0,NULL);//´´½¨Íæ¼Ò×Óµ¯½ø³Ì
+			   HANDLE bullet=CreateThread(NULL,0,Bulletfly,&(player.ID),0,NULL);//åˆ›å»ºç©å®¶å­å¼¹è¿›ç¨‹
 			   CloseHandle(bullet);
 			   player.FireEnable=0;
 			}
 			ReleaseMutex(Mutex);
         }
-		if(EnemyExist==0&&GameOver==0)//Èç¹ûµĞÈË²»´æÔÚÉú³ÉĞÂµĞÈË
+		if(EnemyExist==0&&GameOver==0)//å¦‚æœæ•Œäººä¸å­˜åœ¨ç”Ÿæˆæ–°æ•Œäºº
 		{
 			WaitForSingleObject(Mutex,INFINITE);
 			EnemyExist=1;
-			temp=CreateThread(NULL,0,TankRuning,NULL,0,NULL);//´´½¨µĞÈËÏß³Ì
+			temp=CreateThread(NULL,0,TankRuning,NULL,0,NULL);//åˆ›å»ºæ•Œäººçº¿ç¨‹
 			CloseHandle(temp);
 			ReleaseMutex(Mutex);
 		}
@@ -707,12 +707,12 @@ int main()
 	system("cls");
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_INTENSITY| FOREGROUND_BLUE);
 	SetPos(20,10);
-	cout<<"ÓÎÏ·½áÊø"<<endl;
+	cout<<"æ¸¸æˆç»“æŸ"<<endl;
 	SetPos(20,11);
-	cout<<"É±µĞÊı£º"<<Kill;
+	cout<<"æ€æ•Œæ•°ï¼š"<<Kill;
 	SetPos(20,12);
-	cout<<"É±ËÀºìÌ¹¿Ë"<<KillRed;
+	cout<<"æ€æ­»çº¢å¦å…‹"<<KillRed;
 	SetPos(20,13);
-	cout<<"É±ËÀÂÌÌ¹¿Ë"<<KillGreen<<endl;
+	cout<<"æ€æ­»ç»¿å¦å…‹"<<KillGreen<<endl;
 	return 0;
 }
